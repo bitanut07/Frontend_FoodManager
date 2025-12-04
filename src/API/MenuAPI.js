@@ -1,9 +1,8 @@
-import axios from "axios";
+import { axiosClient } from "./axiosConfig";
 import { API_BASE_URL } from "../Config/apiConfig";
 
-const client = axios.create({
-  baseURL: API_BASE_URL,
-});
+// Use shared axios client with timeout, but keep API_BASE_URL for compatibility
+const client = axiosClient;
 
 const parseImages = (value) => {
   if (Array.isArray(value)) {
@@ -31,6 +30,8 @@ const normalizeProduct = (item) => ({
   category: item.category,
 });
 
+// Auth header is automatically added by axios interceptor
+// Keep this for backward compatibility if needed
 const getAuthHeader = () => {
   const token = localStorage.getItem("token");
   return token

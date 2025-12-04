@@ -1,16 +1,7 @@
-import axios from "axios";
+import { axiosClient } from "./axiosConfig";
 
-const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || "http://127.0.0.1:3000";
-
-const client = axios.create({
-  baseURL: API_BASE_URL,
-  headers: { "Content-Type": "application/json" },
-});
-
-const getAuthHeader = () => {
-  const token = localStorage.getItem("token");
-  return token ? { Authorization: `Bearer ${token}` } : {};
-};
+// Use shared axios client with 60s timeout
+const client = axiosClient;
 
 // Lấy tất cả voucher (public)
 export const getAllVouchers = async () => {
@@ -26,9 +17,7 @@ export const getAllVouchers = async () => {
 // Lấy voucher của user đã lưu
 export const getUserVouchers = async () => {
   try {
-    const response = await client.get("/user/vouchers", {
-      headers: getAuthHeader(),
-    });
+    const response = await client.get("/user/vouchers");
     return response.data;
   } catch (error) {
     console.error("Error fetching user vouchers:", error);
@@ -39,13 +28,9 @@ export const getUserVouchers = async () => {
 // User lưu voucher
 export const saveVoucher = async (voucherCode) => {
   try {
-    const response = await client.post(
-      "/vouchers/assign",
-      { voucher_code: voucherCode },
-      {
-        headers: getAuthHeader(),
-      }
-    );
+    const response = await client.post("/vouchers/assign", {
+      voucher_code: voucherCode,
+    });
     return response.data;
   } catch (error) {
     console.error("Error saving voucher:", error);
@@ -70,9 +55,7 @@ export const createVoucher = async (voucherData) => {
       usage_limit_per_user: Number(voucherData.usage_limit_per_user) || 1,
       usage_limit_global: Number(voucherData.usage_limit_global) || 100,
     };
-    const response = await client.post("/vouchers", data, {
-      headers: getAuthHeader(),
-    });
+    const response = await client.post("/vouchers", data);
     return response.data;
   } catch (error) {
     console.error("Error creating voucher:", error);
@@ -98,9 +81,7 @@ export const updateVoucher = async (voucherId, voucherData) => {
       usage_limit_per_user: Number(voucherData.usage_limit_per_user) || 1,
       usage_limit_global: Number(voucherData.usage_limit_global) || 100,
     };
-    const response = await client.put(`/vouchers/${voucherId}`, data, {
-      headers: getAuthHeader(),
-    });
+    const response = await client.put(`/vouchers/${voucherId}`, data);
     return response.data;
   } catch (error) {
     console.error("Error updating voucher:", error);
@@ -111,9 +92,7 @@ export const updateVoucher = async (voucherId, voucherData) => {
 // Lấy voucher theo ID
 export const getVoucherById = async (voucherId) => {
   try {
-    const response = await client.get(`/vouchers/${voucherId}`, {
-      headers: getAuthHeader(),
-    });
+    const response = await client.get(`/vouchers/${voucherId}`);
     return response.data;
   } catch (error) {
     console.error("Error fetching voucher:", error);
@@ -124,9 +103,7 @@ export const getVoucherById = async (voucherId) => {
 // Admin: Xóa voucher
 export const deleteVoucher = async (voucherId) => {
   try {
-    const response = await client.delete(`/vouchers/${voucherId}`, {
-      headers: getAuthHeader(),
-    });
+    const response = await client.delete(`/vouchers/${voucherId}`);
     return response.data;
   } catch (error) {
     console.error("Error deleting voucher:", error);
